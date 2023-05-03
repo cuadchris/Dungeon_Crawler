@@ -56,10 +56,17 @@ for mob in mob_types:
     mob_animations.append(animations_list)
 
 # create player
-player = Character(100, 100, mob_animations, 0)
+player = Character(100, 100, 100, mob_animations, 0)
+
+# create enemy
+enemy = Character(200, 300, 100, mob_animations, 1)
 
 # create player's weapon
 bow = Weapon(bow_image, arrow_image)
+
+# create empty enemy list
+enemy_list = []
+enemy_list.append(enemy)
 
 # create sprite groups
 arrow_group = pygame.sprite.Group()
@@ -89,18 +96,25 @@ while run:
     player.move(dx, dy)
 
     # update player
+    for enemy in enemy_list:
+        enemy.update()
     player.update()
     arrow = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
     for arrow in arrow_group:
-        arrow.update()
+        arrow.update(enemy_list)
 
     # draw player on screen
+    for enemy in enemy_list:
+        enemy.draw(screen)
     player.draw(screen)
     bow.draw(screen)
     for arrow in arrow_group:
         arrow.draw(screen)
+
+    """TESTING AREA FOR PRINTS"""
+    print(enemy.health, enemy.alive)
 
     # event handler
     for event in pygame.event.get():
