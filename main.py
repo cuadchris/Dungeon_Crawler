@@ -30,6 +30,15 @@ def scale_img(image, scale):
     return pygame.transform.scale(image, (w * scale, h * scale))
 
 
+# load heart images
+heart_empty = scale_img(pygame.image.load(
+    'assets/images/items/heart_empty.png').convert_alpha(), constants.ITEM_SCALE)
+heart_full = scale_img(pygame.image.load(
+    'assets/images/items/heart_full.png').convert_alpha(), constants.ITEM_SCALE)
+heart_half = scale_img(pygame.image.load(
+    'assets/images/items/heart_half.png').convert_alpha(), constants.ITEM_SCALE)
+
+
 # load weapon images
 bow_image = scale_img(pygame.image.load(
     'assets/images/weapons/bow.png').convert_alpha(), constants.WEAPON_SCALE)
@@ -57,6 +66,26 @@ for mob in mob_types:
             temp_list.append(img)
         animations_list.append(temp_list)
     mob_animations.append(animations_list)
+
+# function for displaying game info
+
+
+def draw_info():
+    pygame.draw.rect(screen, constants.PANEL,
+                     (0, 0, constants.SCREEN_WIDTH, 50))
+    pygame.draw.line(screen, constants.WHITE, (0, 50),
+                     (constants.SCREEN_WIDTH, 50))
+    # draw lives
+    half_heart_drawn = False
+    for i in range(5):
+        if player.health >= ((i + 1) * 20):
+            screen.blit(heart_full, (10 + i * 50, 0))
+        elif (player.health % 20 > 0) and not half_heart_drawn:
+            screen.blit(heart_half, (10 + i * 50, 0))
+            half_heart_drawn = True
+        else:
+            screen.blit(heart_empty, (10 + i * 50, 0))
+
 
 # damage text class
 
@@ -145,8 +174,7 @@ while run:
 
     damage_text_group.draw(screen)
 
-    """TESTING AREA FOR PRINTS"""
-    print(enemy.health, enemy.alive)
+    draw_info()
 
     # event handler
     for event in pygame.event.get():
