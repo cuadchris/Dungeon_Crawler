@@ -1,4 +1,5 @@
 import pygame
+import csv
 import constants
 from character import Character
 from weapon import Weapon
@@ -13,6 +14,9 @@ pygame.display.set_caption("Dungeon Crawler")
 
 # create clock for maintaining frame rate
 clock = pygame.time.Clock()
+
+# define game variables
+level = 1
 
 # define player movement variables
 moving_left = False
@@ -120,13 +124,16 @@ def draw_info():
               constants.SCREEN_WIDTH - 100, 15)
 
 
-world_data = [
-    [7, 7, 7, 7, 7],
-    [7, 0, 1, 2, 7],
-    [7, 3, 4, 5, 7],
-    [7, 6, 6, 6, 7],
-    [7, 7, 7, 7, 7],
-]
+# create empty tile list
+world_data = [[-1] * constants.COLS for i in range(constants.ROWS)]
+
+# load in level data and create world
+with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
 
 world = World()
 world.process_data(world_data, tile_list)
