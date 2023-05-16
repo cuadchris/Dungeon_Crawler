@@ -17,6 +17,7 @@ clock = pygame.time.Clock()
 
 # define game variables
 level = 1
+screen_scroll = [0, 0]
 
 # define player movement variables
 moving_left = False
@@ -148,7 +149,10 @@ class DamageText(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.counter = 0
 
-    def update(self):
+    def update(self, screen_scroll):
+        # reposition based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
         # move damage text up
         self.rect.y -= 1
         # delete the counter after a few seconds
@@ -158,10 +162,10 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # create player
-player = Character(100, 100, 30, mob_animations, 0)
+player = Character(400, 300, 30, mob_animations, 0)
 
 # create enemy
-enemy = Character(200, 300, 100, mob_animations, 1)
+enemy = Character(300, 300, 100, mob_animations, 1)
 
 # create player's weapon
 bow = Weapon(bow_image, arrow_image)
@@ -175,7 +179,7 @@ damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
-score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images)
+score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
 item_group.add(score_coin)
 
 potion = Item(200, 200, 1, [red_potion])
@@ -206,24 +210,26 @@ while run:
         dy = constants.SPEED
 
     # move player
-    player.move(dx, dy)
+    screen_scroll = player.move(dx, dy)
 
-    # update player
+    # update all objects
+    world.update(screen_scroll)
     for enemy in enemy_list:
+        enemy.ai(screen_scroll)
         enemy.update()
     player.update()
     arrow = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
     for arrow in arrow_group:
-        damage, damage_pos = arrow.update(enemy_list)
+        damage, damage_pos = arrow.update(screen_scroll, enemy_list)
         if damage:
             damage_text = DamageText(
                 damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
             damage_text_group.add(damage_text)
 
-    damage_text_group.update()
-    item_group.update(player)
+    damage_text_group.update(screen_scroll)
+    item_group.update(screen_scroll, player)
 
     # draw player on screen
     world.draw(screen)
