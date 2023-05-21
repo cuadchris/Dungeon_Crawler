@@ -35,22 +35,22 @@ class World():
                 elif tile == 10:
                     potion = Item(image_x, image_y, 1, [item_images[1]])
                     self.item_list.append(potion)
-                    tile_data[0] = tile_list[1]
+                    tile_data[0] = tile_list[0]
                 elif tile == 11:
                     player = Character(image_x, image_y, 100,
                                        mob_animations, 0, False, 1)
                     self.player = player
-                    tile_data[0] = tile_list[1]
+                    tile_data[0] = tile_list[0]
                 elif tile >= 12 and tile <= 16:
                     enemy = Character(image_x, image_y, 100,
                                       mob_animations, tile - 11, False, 1)
                     self.character_list.append(enemy)
-                    tile_data[0] = tile_list[1]
+                    tile_data[0] = tile_list[0]
                 elif tile == 17:
                     enemy = Character(image_x, image_y, 100,
                                       mob_animations, 6, True, 2)
                     self.character_list.append(enemy)
-                    tile_data[0] = tile_list[1]
+                    tile_data[0] = tile_list[0]
 
                 # add image data to main tiles list
                 if tile >= 0:
