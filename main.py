@@ -5,6 +5,7 @@ from character import Character
 from weapon import Weapon
 from items import Item
 from world import World
+from button import Button
 
 pygame.init()
 
@@ -36,6 +37,11 @@ def scale_img(image, scale):
     w = image.get_width()
     h = image.get_height()
     return pygame.transform.scale(image, (w * scale, h * scale))
+
+
+# load button images
+restart_img = scale_img(pygame.image.load(
+    "assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
 
 
 # load heart images
@@ -239,6 +245,10 @@ for item in world.item_list:
 intro_fade = ScreenFade(1, constants.BLACK, 4)
 death_fade = ScreenFade(2, constants.PINK, 4)
 
+# create buttons
+restart_button = Button(constants.SCREEN_WIDTH // 2 -
+                        175, constants.SCREEN_HEIGHT // 2 - 50, restart_img)
+
 # main game loop
 run = True
 while run:
@@ -339,26 +349,27 @@ while run:
     # show death screen
     if player.alive == False:
         if death_fade.fade():
-            death_fade.fade_counter = 0
-            start_intro = True
-            world_data = reset_level()
-            # load in level data and create world
-            with open(f"levels/level{level}_data.csv", newline="") as csvfile:
-                reader = csv.reader(csvfile, delimiter=",")
-                for x, row in enumerate(reader):
-                    for y, tile in enumerate(row):
-                        world_data[x][y] = int(tile)
-            world = World()
-            world.process_data(world_data, tile_list,
-                               item_images, mob_animations)
-            player = world.player
-            enemy_list = world.character_list
-            score_coin = Item(constants.SCREEN_WIDTH - 115,
-                              23, 0, coin_images, True)
-            item_group.add(score_coin)
-            # add the items from the level data
-            for item in world.item_list:
-                item_group.add(item)
+            if restart_button.draw(screen):
+                death_fade.fade_counter = 0
+                start_intro = True
+                world_data = reset_level()
+                # load in level data and create world
+                with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+                    reader = csv.reader(csvfile, delimiter=",")
+                    for x, row in enumerate(reader):
+                        for y, tile in enumerate(row):
+                            world_data[x][y] = int(tile)
+                world = World()
+                world.process_data(world_data, tile_list,
+                                   item_images, mob_animations)
+                player = world.player
+                enemy_list = world.character_list
+                score_coin = Item(constants.SCREEN_WIDTH - 115,
+                                  23, 0, coin_images, True)
+                item_group.add(score_coin)
+                # add the items from the level data
+                for item in world.item_list:
+                    item_group.add(item)
 
     # event handler
     for event in pygame.event.get():
