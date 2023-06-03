@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 import csv
 import constants
 from character import Character
@@ -7,6 +8,7 @@ from items import Item
 from world import World
 from button import Button
 
+mixer.init()
 pygame.init()
 
 screen = pygame.display.set_mode(
@@ -39,6 +41,20 @@ def scale_img(image, scale):
     w = image.get_width()
     h = image.get_height()
     return pygame.transform.scale(image, (w * scale, h * scale))
+
+
+# load music and sounds
+pygame.mixer.music.load("assets/audio/music.wav")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 5000)
+shot_fx = pygame.mixer.Sound("assets/audio/arrow_shot.mp3")
+shot_fx.set_volume(0.5)
+hit_fx = pygame.mixer.Sound("assets/audio/arrow_hit.wav")
+hit_fx.set_volume(0.5)
+coin_fx = pygame.mixer.Sound("assets/audio/coin.wav")
+coin_fx.set_volume(0.5)
+heal_fx = pygame.mixer.Sound("assets/audio/heal.wav")
+heal_fx.set_volume(0.5)
 
 
 # load button images
@@ -317,6 +333,7 @@ while run:
                 arrow = bow.update(player)
                 if arrow:
                     arrow_group.add(arrow)
+                    shot_fx.play()
                 for arrow in arrow_group:
                     damage, damage_pos = arrow.update(
                         screen_scroll, world.obstacle_tiles, enemy_list)
@@ -324,9 +341,10 @@ while run:
                         damage_text = DamageText(
                             damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
                         damage_text_group.add(damage_text)
+                        hit_fx.play()
                 damage_text_group.update()
                 fireball_group.update(screen_scroll, player)
-                item_group.update(screen_scroll, player)
+                item_group.update(screen_scroll, player, coin_fx, heal_fx)
 
             # draw player on screen
             world.draw(screen)
